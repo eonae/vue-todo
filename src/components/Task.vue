@@ -70,7 +70,7 @@ export default {
       bus.$emit('edit', this.task.id);
     },
     toggleDetails() {
-      bus.$emit('toggleDetails', {});
+      bus.$emit('toggleDetails', this.task.id);
     },
     deleteTask() {
       bus.$emit('deleteTask', this.task.id);
@@ -92,10 +92,10 @@ export default {
   transition: 0.5s;
   opacity: 0;
 }
-
+/* 
 .todo-item.active > .btns-group {
   opacity: 1;
-}
+} */
 
 .todo-item:hover > .btns-group {
   opacity: 1;
@@ -165,7 +165,6 @@ export default {
   margin-right: 10px;
   min-width: 100px;
   min-height: 1em;
-  /* white-space: nowrap; */
 }
 
   @media (max-width: 740px) {
@@ -185,7 +184,6 @@ export default {
 .input-field > input {
   font-size: 2em !important;
   margin-left: 10px !important;
-  /* margin-right: 10px; */
   margin-bottom: 0 !important;
   width: 100% !important;
   overflow: hidden;
