@@ -97,8 +97,10 @@ export default {
     background-color: rgba(48, 121, 244,.5);
 }
 
+.vb {
+  flex-grow: 1;
+}
   main {
-    flex: 1 1 0;
     box-sizing: border-box;
     padding-right: 2em;
     margin-top: 1px;
