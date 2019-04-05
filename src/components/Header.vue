@@ -3,7 +3,7 @@
 header.card-panel.indigo.darken-4
   button#add.btn-floating.btn-large.waves.waves-effect.waves-light.red(
     type="button",
-    @click="newTask()")
+    @click.stop="newTask()")
     i.material-icons add
   a(href="#" class="brand-logo") MATERIAL TODO
 
@@ -11,8 +11,15 @@ header.card-panel.indigo.darken-4
 
 <script>
 
+import bus from '../EventBus'
+
 export default {
-  name: 'TodoHeader'
+  name: 'TodoHeader',
+  methods: {
+    newTask() {
+      bus.$emit('newTask', {});
+    }
+  }
 }
 
 </script>

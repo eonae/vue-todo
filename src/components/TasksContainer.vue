@@ -1,14 +1,12 @@
 <template lang="pug">
 
-main(data-simplebar)
-  task(v-for="item in tasks",
-      :key = "item.id",
-      :task = "item",
-      :isSelected = "selected === item.id",
-      :isBeingEdited = "edited === item.id",
-      @select = "updateSelection($event)",
-      @edit = "updateSelection($event, true)",
-      @finishEditing = "finishEditing()")
+div(v-bar)
+  main
+    task(v-for="item in tasks",
+        :key = "item.id",
+        :task = "item",
+        :isSelected = "selectedTaskId === item.id",
+        :isBeingEdited = "editedTaskId === item.id")
 
 </template>
 
@@ -20,8 +18,8 @@ import tasks from '../tasks.js'
 export default {
 
   props: {
-    selected: Number,
-    edited: Number
+    selectedTaskId: Number,
+    editedTaskId: Number
   },
 
   data: function () {
@@ -34,23 +32,6 @@ export default {
     Task
   },
   methods: {
-
-    updateSelection(id, edit) {
-      if (id === null) {
-        this.$emit('reset');
-      } else {
-        if (edit) {
-          this.$emit('edit', id);
-        } else {
-          this.$emit('select', id);
-        }        
-      }
-    },
-
-    finishEditing() {
-      this.$emit('finishEditing', {});
-    }
-
   }
 }
 
@@ -58,20 +39,58 @@ export default {
 
 <style>
 
+ .vb > .vb-dragger {
+   width: 10px;
+   right: 8px;
+   /* z-index: 1000; */
+ }
+
+ .vb > .vb-dragger > .vb-dragger-styler {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: rotate3d(0,0,0,0);
+    transform: rotate3d(0,0,0,0);
+    -webkit-transition:
+        background-color 100ms ease-out,
+        margin 100ms ease-out,
+        height 100ms ease-out;
+    transition:
+        background-color 100ms ease-out,
+        margin 100ms ease-out,
+        height 100ms ease-out;
+    background-color: rgba(48, 121, 244,.1);
+    margin: 5px 5px 5px 0;
+    border-radius: 20px;
+    height: calc(100% - 10px);
+    display: block;
+}
+
+.vb.vb-scrolling-phantom > .vb-dragger > .vb-dragger-styler {
+    background-color: rgba(48, 121, 244,.3);
+}
+
+.vb > .vb-dragger:hover > .vb-dragger-styler {
+    background-color: rgba(48, 121, 244,.5);
+    margin: 0px;
+    height: 100%;
+}
+
+.vb.vb-dragging > .vb-dragger > .vb-dragger-styler {
+    background-color: rgba(48, 121, 244,.5);
+    margin: 0px;
+    height: 100%;
+}
+
+.vb.vb-dragging-phantom > .vb-dragger > .vb-dragger-styler {
+    background-color: rgba(48, 121, 244,.5);
+}
+
   main {
     flex: 1 1 0;
-    padding-right: 1em;
-    padding-bottom: 5em;
-    margin-right: .5em;
+    box-sizing: border-box;
+    padding-right: 2em;
     margin-top: 1px;
-    /* overflow-y: scroll; */
-  }
-
-  main .simplebar-wrapper {
-
-    height: 100px;
-    width: 100px;
-    /* костыль, но работает */
+    width: 100%;
   }
 
   @media (max-width: 740px) {
@@ -79,6 +98,5 @@ export default {
       margin-right: 0;
     }
   }
-
 
 </style>

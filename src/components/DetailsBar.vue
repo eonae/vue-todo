@@ -1,44 +1,41 @@
 <template lang="pug">
 
-aside.card
+aside(:class="[(isActive) ? 'active' : '', 'card']")
   div.card-panel.red.details-header
     div Notes
-    button#hideDetails.btn-floating.btn-large.waves-effect.waves-light.red(type="button" @click="emitHide()")
+    button#hideDetails.btn-floating.btn-large.waves-effect.waves-light.red(type="button" @click="hide()")
       i.material-icons send
-  .details-content(data-simplebar)
-    .textarea-wrapper
+  
+  div(v-bar)
+    .details-content
       textarea#notes.materialize-textarea(
+        v-if="task",
         name="details",
-        maxlength="50",
-        placeholder="Put your notes here..")
+        maxlength="70",
+        placeholder="Put your notes here..",
+        v-model.lazy="task.details")
 
 </template>
 
 <script>
 
-import simplebar from 'simplebar';
+import bus from '../EventBus';
 
 export default {
   name: 'DetailsBar',
 
-  // props: {
-  //   task: {
-  //     type: Object,
-  //     required: true
-  //   }
-  // },
+  props: ['task', 'isActive'],
 
   methods: {
-    emitHide () {
+    hide () {
       console.log('hide!');
-      this.$emit('hide', {});
+      bus.$emit('toggleDetails', {});
     }
   }
 }
 </script>
 
 <style>
-
 
 .details-header {
   display: flex;
@@ -64,6 +61,10 @@ aside {
   flex-direction: column;
 }
 
+.active {
+  opacity: 1 !important;
+}
+
   @media (max-width: 740px) {
     aside {
       position: absolute !important;
@@ -73,6 +74,9 @@ aside {
       transform: translateY(-100%);
       flex-direction: row !important;
       z-index: 1000;
+      margin-bottom: 0 !important;
+      transition: 0.5s;
+      opacity: 0;
     }
     .details-header {
       font-size: 1.7em !important;

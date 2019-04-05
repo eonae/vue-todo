@@ -1,12 +1,13 @@
 <template lang="pug">
 
 .todo-item.card(
-  @click="clickHandler($event.target)",
-  :class="[ this.isSelected ? 'indigo lighten-5' : '', 'todo-item card']")
+  @click="select()",
+  :class="[ this.isSelected ? 'indigo lighten-5 active' : '', 'todo-item card']")
     label
       input.custom-checkbox(
         type="checkbox",
-        :checked="task.done")
+        :checked="task.done",
+        @change.stop="change($event)")
       span
     transition
       .input-field(v-if="isBeingEdited")
@@ -14,13 +15,21 @@
           type="text",
           v-model.lazy="task.text",
           v-focus,
-          @blur="finishEditing()",
+          @click.stop="",
+          @blur="stopEdit()",
           @keyup.enter="$event.target.blur()")
-      .task(v-else) {{ task.text }}
+      .task(v-else, @click.stop="edit()") {{ task.text }}
+    .btns-group
+      button.btn-notes.icon-btn(@click.stop="toggleDetails()")
+        i.material-icons subject
+      button.btn-delete.icon-btn(@click.stop="deleteTask()")
+        i.material-icons delete
 
 </template>
 
 <script>
+
+import bus from '../EventBus.js'
 
 export default {
 
@@ -50,16 +59,24 @@ export default {
   },
 
   methods: {
-    clickHandler(target) {
-      if (target.classList.contains('task')) {
-        this.$emit('edit', this.task.id);
-      } else if (target.classList.contains('card')) {
-        this.$emit('select', (!this.isSelected) ? this.task.id : null)
-      }
+    select() {
+      bus.$emit('select', (!this.isSelected) ? this.task.id : null)
     },
-    finishEditing() {
-      console.log('task stop edit')
-      this.$emit('finishEditing', {});
+    stopEdit() {
+      console.log('stopEdit');
+      bus.$emit('stopEdit', this.task.id);
+    },
+    edit() {
+      bus.$emit('edit', this.task.id);
+    },
+    toggleDetails() {
+      bus.$emit('toggleDetails', {});
+    },
+    deleteTask() {
+      bus.$emit('deleteTask', this.task.id);
+    },
+    change($event) {
+      bus.$emit('taskStatusChange', this.task.id, $event.target.checked);
     }
   }
 }
@@ -67,6 +84,40 @@ export default {
 </script>
 
 <style>
+
+.btns-group {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  transition: 0.5s;
+  opacity: 0;
+}
+
+.todo-item.active > .btns-group {
+  opacity: 1;
+}
+
+.todo-item:hover > .btns-group {
+  opacity: 1;
+}
+
+.btn-notes {
+  display: none;
+}
+
+.icon-btn {
+  border: none;
+  background: none;
+  outline: none;
+  padding: 2px;
+  transition: .5s;
+}
+
+@media (max-width: 740px) {
+  .btn-notes {
+    display: block;
+  }
+}
 
 .todo-item {
   width: 100%;
@@ -78,7 +129,11 @@ export default {
 }
 
 .todo-item:first-child {
-  margin-top: 1px;
+  margin-top: 2px;
+}
+
+.todo-item:last-child {
+  margin-bottom: 3px;
 }
 
 .todo-item input[type="checkbox"]:not(:checked) + span::before {
@@ -107,6 +162,7 @@ export default {
 .task {
   font-size: 2em;
   margin-left: 10px;
+  margin-right: 10px;
   min-width: 100px;
   min-height: 1em;
   /* white-space: nowrap; */
@@ -114,7 +170,7 @@ export default {
 
   @media (max-width: 740px) {
     .input-field {
-      font-size: 1.2em;
+      font-size: 1.2em !important;
     }
     .task {
       font-size: 1.2em;
@@ -123,12 +179,13 @@ export default {
 
 .input-field {
   margin: 0 !important;
-  width: 80% !important;
+  width: 75% !important;
 }
 
 .input-field > input {
   font-size: 2em !important;
   margin-left: 10px !important;
+  /* margin-right: 10px; */
   margin-bottom: 0 !important;
   width: 100% !important;
   overflow: hidden;

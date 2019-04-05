@@ -1,10 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
+import VueBar from 'vuebar'
 
 import 'materialize-css'
 import 'materialize-css/dist/css/materialize.css'
 
-Vue.config.productionTip = false
+Vue.use(VueBar);
+
+Vue.config.productionTip = false;
 
 new Vue({
   render: h => h(App),
