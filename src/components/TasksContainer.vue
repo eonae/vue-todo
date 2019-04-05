@@ -2,11 +2,12 @@
 
 div(v-bar)
   main
-    task(v-for="item in tasks",
-        :key = "item.id",
-        :task = "item",
-        :isSelected = "selectedTaskId === item.id",
-        :isBeingEdited = "editedTaskId === item.id")
+    transition-group(tag="div" name="tasks")
+      task(v-for="item in tasks",
+          :key = "item.id",
+          :task = "item",
+          :isSelected = "selectedTaskId === item.id",
+          :isBeingEdited = "editedTaskId === item.id")
 
 </template>
 
@@ -38,6 +39,17 @@ export default {
 </script>
 
 <style>
+
+.tasks-enter-active, .tasks-leave-active {
+  transition: 0.2s !important;
+}
+.tasks-enter, .tasks-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+  margin: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+}
 
  .vb > .vb-dragger {
    width: 10px;

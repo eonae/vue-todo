@@ -54,7 +54,6 @@ export default {
   methods: {
 
     removeTask(id) {
-      debugger;
       const index = this.tasks.findIndex(t => t.id === id);
         if (index != -1)
           this.tasks.splice(index, 1);
@@ -93,7 +92,6 @@ export default {
     },
 
     newTask() {
-      // debugger;
       this.removeIfEmpty(this.editedTaskId);
       this.tasks.unshift({
         id: this.nextId,
