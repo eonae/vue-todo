@@ -1,11 +1,6 @@
 <template lang="pug">
 
 footer.card-panel.indigo.darken-4
-  // button#add.btn-floating.btn-large.waves.waves-effect.waves-light.red(
-  //   type="button",
-  //   @click="newTask()")
-  //   i.material-icons add
-  a(href="#" class="brand-logo")
 
 </template>
 

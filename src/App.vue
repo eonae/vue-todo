@@ -1,6 +1,7 @@
 <template lang="pug">
+
   div#app
-    todo-header
+    todo-header(:disableAdd="editing")
     .flex-cont
       tasks-container(tasks="tasks",
       :selectedTaskId="selectedTaskId",
@@ -10,6 +11,7 @@
         :task="selectedTask",
         :isActive="detailsShown")
     todo-footer
+    
 </template>
 
 <script>
@@ -38,6 +40,9 @@ export default {
     selectedTask() {
       const task = tasks.find(t => t.id === this.selectedTaskId);
       return (task) ? task : null;
+    },
+    editing() {
+      return this.editedTaskId !== null
     }
   },
 
@@ -62,10 +67,11 @@ export default {
     },
 
     removeIfEmpty(id) {
+
       if (id !== null) {
         const task = this.tasks.find(t => t.id === id);
         if (task.text === '' && task.details === '')
-          this.removeTask(task);
+          this.removeTask(task.id);
       }
     },
 

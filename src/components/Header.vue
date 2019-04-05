@@ -1,7 +1,9 @@
 <template lang="pug">
 
 header.card-panel.indigo.darken-4
-  button#add.btn-floating.btn-large.waves.waves-effect.waves-light.red(
+  button#add.btn-floating.btn-large.waves-effect.waves-light.red(
+    :class="disableAdd ? 'disabled' : ''",
+    :disabled="disableAdd",
     type="button",
     @click.stop="newTask()")
     i.material-icons add
@@ -15,6 +17,11 @@ import bus from '../EventBus'
 
 export default {
   name: 'TodoHeader',
+
+  props: {
+    disableAdd: Boolean
+  },
+
   methods: {
     newTask() {
       bus.$emit('newTask', {});
