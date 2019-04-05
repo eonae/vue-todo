@@ -1,27 +1,41 @@
 <template lang="pug">
-  .flex-cont
-    tasks-container(tasks="tasks",
-    :selectedTaskId="selectedTaskId",
-    :editedTaskId="editedTaskId")
+    .content-wrapper
+      .flex-cont
 
-    details-bar(
-      :task="selectedTask",
-      :isActive="detailsShown")
+        button#add.btn-floating.btn-large.waves-effect.waves-light.red(
+          :class="disableAdd ? 'disabled' : ''",
+          :disabled="editing",
+          type="button",
+          @click.stop="newTask()")
+          i.material-icons add
+
+        tasks-container(tasks="tasks",
+        :selectedTaskId="selectedTaskId",
+        :editedTaskId="editedTaskId")
+
+        details-bar(
+          :task="selectedTask",
+          :isActive="detailsShown")
+
 </template>
 
 <script>
 
-import TasksContainer from './components/TasksContainer.vue'
-import DetailsBar from './components/DetailsBar.vue'
+import TasksContainer from '../components/TasksContainer.vue'
+import DetailsBar from '../components/DetailsBar.vue'
 
-import tasks from './tasks.js';
-import bus from './EventBus.js'
+import tasks from '../tasks.js';
+import bus from '../EventBus.js'
 
 export default {
+
+  name: 'TasksScreen',
+
   components: {
     TasksContainer,
     DetailsBar
   },
+
   computed: {
     selectedTask() {
       const task = tasks.find(t => t.id === this.selectedTaskId);
@@ -69,6 +83,9 @@ export default {
 
     select(id) {
       this.removeIfEmpty(this.editedTaskId);
+      if (id === null) {
+        this.detailsShown = false;
+      }
       this.selectedTaskId = id;
     },
 
@@ -108,7 +125,6 @@ export default {
       console.log('select ' + taskId);
     });
     bus.$on('stopEdit', taskId => {
-      
       this.stopEdit(taskId);
       console.log('stopEdit ' + taskId);
     });
@@ -120,8 +136,11 @@ export default {
       this.removeTask(taskId);
       console.log('delete ' + taskId);
     });
-    bus.$on('toggleDetails', () => {
+    bus.$on('toggleDetails', taskId => {
       this.detailsShown = !this.detailsShown;
+      if (typeof taskId !== undefined) {
+        this.select(taskId);
+      }
       console.log('toggleDetails');
     });
     bus.$on('hideDetails', () => {
@@ -138,20 +157,38 @@ export default {
 </script>
 
 <style>
-  
+
+.content-wrapper {
+  padding-top: 70px;
+  padding-bottom: 70px;
+  height: 100vh;
+}
+
 .flex-cont {
   display: flex;
-  padding-top: 70px;
-  margin-bottom: 30px;
   width: 100%;
-
-  height: calc(100vh - 70px);
+  height: 100%;
   overflow: hidden;
 }
 
 @media (max-width: 740px) {
   .flex-cont {
     flex-direction: column;
+  }
+}
+
+#add {
+  position: absolute;
+  top: 56px !important;
+
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 740px) {
+  #add {
+    left: 100% !important;
+    transform: translateX(-100%) translateY(-50%) translateX(-10px) !important;
   }
 }
 

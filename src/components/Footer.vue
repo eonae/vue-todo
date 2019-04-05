@@ -36,14 +36,6 @@ footer {
   }
 }
 
-#add {
-  position: fixed !important;
-  top: 56px;
-  left: 10px;
-  transform: translateY(-50%);
-  z-index: 9000;
-}
-
 @media (min-width: 601px) {
   #add {
     top: 64px;

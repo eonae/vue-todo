@@ -1,13 +1,7 @@
 <template lang="pug">
 
 header.card-panel.indigo.darken-4
-  button#add.btn-floating.btn-large.waves-effect.waves-light.red(
-    :class="disableAdd ? 'disabled' : ''",
-    :disabled="disableAdd",
-    type="button",
-    @click.stop="newTask()")
-    i.material-icons add
-  a(href="#" class="brand-logo") MATERIAL TODO
+  a(href="#" class="brand-logo") EONAE TODO
 
 </template>
 
@@ -16,17 +10,7 @@ header.card-panel.indigo.darken-4
 import bus from '../EventBus'
 
 export default {
-  name: 'TodoHeader',
-
-  props: {
-    disableAdd: Boolean
-  },
-
-  methods: {
-    newTask() {
-      bus.$emit('newTask', {});
-    }
-  }
+  name: 'TodoHeader'
 }
 
 </script>
@@ -54,24 +38,12 @@ header {
   header {
     justify-content: center;
   }
-  #add {
-    left: 100% !important;
-    transform: translateX(-100%) translateY(-50%) translateX(-10px) !important;
-  }
 }
 
 @media (max-width: 400px) {
   .brand-logo {
     font-size: 0.7em;
   }
-}
-
-#add {
-  position: absolute;
-  top: 100% !important;
-
-  left: 10px;
-  transform: translateY(-50%);
 }
 
 </style>

@@ -2,7 +2,7 @@
 
   div#app
   
-    todo-header(:disableAdd="editing")
+    todo-header
 
     router-view
 
@@ -18,6 +18,7 @@ import TodoHeader from './components/Header.vue'
 import TodoFooter from './components/Footer.vue'
 
 import TasksScreen from './views/TasksScreen.vue'
+import StartScreen from './views/StartScreen.vue'
 
 export default {
   name: 'app',
@@ -30,7 +31,9 @@ export default {
   router: new VueRouter({
     routes: [
       // { path: '/tasks', component: TaskScreen },
-      { path: '/home', component: TaskScreen }
+      { path: '/tasks', component: TasksScreen },
+      { path: '/home', component: StartScreen },
+      { path: '/', redirect: '/home' }
     ]
   })
 }
