@@ -92,10 +92,10 @@ export default {
   transition: 0.5s;
   opacity: 0;
 }
-
+/* 
 .todo-item.active > .btns-group {
   opacity: 1;
-}
+} */
 
 .todo-item:hover > .btns-group {
   opacity: 1;
