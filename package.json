@@ -12,6 +12,7 @@
     "materialize-css": "^1.0.0-rc.2",
     "simplebar": "^3.1.5",
     "vue": "^2.6.6",
+    "vue-router": "^3.0.2",
     "vuebar": "^0.0.20"
   },
   "devDependencies": {
