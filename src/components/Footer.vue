@@ -17,7 +17,7 @@ export default {
 footer {
   position: absolute;
   width: 100%;
-  height: 56px;
+  height: 25px;
   left: 0;
   top: 100%;
   transform: translateY(-100%);
@@ -33,12 +33,6 @@ footer {
 @media (max-width: 992px) {
   .brand-logo {
     margin: 0;
-  }
-}
-
-@media (min-width: 601px) {
-  #add {
-    top: 64px;
   }
 }
 

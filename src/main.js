@@ -6,6 +6,8 @@ import VueRouter from 'vue-router'
 import 'materialize-css'
 import 'materialize-css/dist/css/materialize.css'
 
+import authService from './servives/auth';
+
 Vue.use(VueRouter);
 Vue.use(VueBar);
 

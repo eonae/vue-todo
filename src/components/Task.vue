@@ -83,7 +83,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 
 .btns-group {
   display: flex;
@@ -123,6 +123,7 @@ export default {
   width: 100%;
   padding: 2em;
   margin-left: 2px !important;
+  padding-right: 2%;
   display: flex;
   align-items: center;
   overflow: hidden !important;

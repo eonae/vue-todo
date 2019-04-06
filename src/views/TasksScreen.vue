@@ -1,21 +1,20 @@
 <template lang="pug">
-    .content-wrapper
-      .flex-cont
 
-        button#add.btn-floating.btn-large.waves-effect.waves-light.red(
-          :class="disableAdd ? 'disabled' : ''",
-          :disabled="editing",
-          type="button",
-          @click.stop="newTask()")
-          i.material-icons add
+  .flex-cont
 
-        tasks-container(tasks="tasks",
-        :selectedTaskId="selectedTaskId",
-        :editedTaskId="editedTaskId")
+    button#add.btn-floating.btn-large.waves-effect.waves-light.red(
+      :disabled="editing",
+      type="button",
+      @click.stop="newTask()")
+      i.material-icons add
 
-        details-bar(
-          :task="selectedTask",
-          :isActive="detailsShown")
+    tasks-container(tasks="tasks",
+    :selectedTaskId="selectedTaskId",
+    :editedTaskId="editedTaskId")
+
+    details-bar(
+      :task="selectedTask",
+      :isActive="detailsShown")
 
 </template>
 
@@ -124,19 +123,15 @@ export default {
     });
     bus.$on('select', taskId => {
       this.select(taskId);
-      console.log('select ' + taskId);
     });
     bus.$on('stopEdit', taskId => {
       this.stopEdit(taskId);
-      console.log('stopEdit ' + taskId);
     });
     bus.$on('newTask', () => {
       this.newTask();
-      console.log('new task');
     })
     bus.$on('deleteTask', taskId => {
       this.removeTask(taskId);
-      console.log('delete ' + taskId);
     });
 
     bus.$on('toggleDetails', taskId => {
@@ -144,15 +139,12 @@ export default {
       if (typeof taskId !== undefined) {
         this.select(taskId);
       }
-      console.log('toggleDetails');
     });
     bus.$on('hideDetails', () => {
       this.detailsShown = false;
-      console.log('hideDetails');
     });
     bus.$on('taskStatusChange', (taskId, value) => {
       this.tasks.find(t => t.id === taskId).done = value;
-      console.log(value);
     })
   }
 }
@@ -160,12 +152,6 @@ export default {
 </script>
 
 <style>
-
-.content-wrapper {
-  padding-top: 70px;
-  padding-bottom: 70px;
-  height: 100vh;
-}
 
 .flex-cont {
   display: flex;
