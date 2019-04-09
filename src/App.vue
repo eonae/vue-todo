@@ -2,7 +2,7 @@
 
   div#app
   
-    todo-header
+    todo-header(:user="user")
 
     .content-wrapper
       transition(name="router" appear)
@@ -26,11 +26,20 @@ import TasksScreen from './views/TasksScreen.vue'
 import StartScreen from './views/StartScreen.vue'
 import RegisterScreen from './views/RegisterScreen.vue'
 
+
+import auth from './services/auth.js';
+
 Vue.component('modal-window', ModalWindow);
 Vue.component('modal-actions', ModalActions);
 
 export default {
   name: 'app',
+
+  computed: {
+    user() {
+      return auth.user;
+    }
+  },
 
   components: {
     TodoHeader,

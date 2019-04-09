@@ -4,12 +4,14 @@
     form(name="login", action="")
       div.inputs-container
         .input-field.col.s12
-          input.validate(v-model="loginData.email", id="email", type="email")
-          label(for="email") Email
+          input.validate(v-model="loginData.username", id="username", type="text", @input="failed = false")
+          label(for="username") User name
 
         .input-field.col.s12
-          input.validate(v-model="loginData.password", id="pwd", type="password")
+          input.validate(v-model="loginData.password", id="pwd", type="password", @input="failed = false")
           label(for="pwd") Password
+
+        .login-failed(v-if="failed") Invalid username or password!
 
       modal-actions(
         :actions="actions"
@@ -24,22 +26,15 @@ import Modal from '../components/ModalWindow.vue'
 
 export default {
 
-  methods: {
-    submit() {
-      bus.$emit('loginAttempt', this.loginData);
-      console.log('submit');
-      this.$emit('close');
-    },
-    cancel() {
-      this.$emit('close');
-    }
-  },
   data() {
     return {
       loginData: {
-        email: '',
+        username: '',
         password: ''
       },
+
+      failed: false,
+      
       actions: {
         ok: {
           name: 'ok',
@@ -53,6 +48,24 @@ export default {
         }
       }
     }
+  },
+
+  methods: {
+    submit() {
+      bus.$emit('loginAttempt', this.loginData);
+      console.log('submit');
+      // this.$emit('close');
+    },
+    cancel() {
+      this.$emit('close');
+    }
+  },
+  created() {
+    bus.$on('loginFail', err => {
+      if (err.message === '401') {
+        this.failed = true;
+      }
+    });
   }
 }
 </script>
@@ -64,5 +77,11 @@ export default {
   }
   .input-field > input {
     font-size: 2em !important;
+  }
+  .login-failed {
+    color: crimson;
+    font-size: 0.7em;
+    font-weight: 700;
+    text-align: center;
   }
 </style>

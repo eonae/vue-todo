@@ -2,6 +2,8 @@
 
 header.card-panel.indigo.darken-4
   a(href="#" class="brand-logo") EONAE TODO
+  .controls
+    .user {{ user.username }}
 
 </template>
 
@@ -10,7 +12,13 @@ header.card-panel.indigo.darken-4
 import bus from '../EventBus'
 
 export default {
-  name: 'TodoHeader'
+  name: 'TodoHeader',
+  props: {
+    user: {
+      type: Object,
+      required: true
+    }
+  }
 }
 
 </script>

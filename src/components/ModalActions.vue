@@ -3,7 +3,7 @@
   .modal-actions
     button.btn.waves-effect.waves-light.indigo(
       v-for="action in actions",
-      @click="action.func()",
+      @click.prevent="action.func()",
       :disabled="action.disabled"
       ) {{ action.name }}
 
