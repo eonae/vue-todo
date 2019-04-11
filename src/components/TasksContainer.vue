@@ -4,10 +4,10 @@ div(v-bar)
   main
     transition-group(tag="div" name="tasks")
       task(v-for="item in tasks",
-          :key = "item._id",
+          :key = "item.key",
           :task = "item",
-          :isSelected = "selectedTaskId === item._id",
-          :isBeingEdited = "editedTaskId === item._id")
+          :isSelected = "selectedTaskId === item.id",
+          :isBeingEdited = "editedTaskId === item.id")
 
 </template>
 
@@ -18,36 +18,22 @@ import tasksService from '../services/tasks';
 import auth from '../services/auth';
 import {serverUrl} from '../config';
 
-//import tasks from '../tasks.js'
-
-debugger;
-
 export default {
 
   props: {
-    selectedTaskId: Number,
-    editedTaskId: Number
-  },
-
-  data: function () {
-    return {
-      tasks: []
-    }
+    tasks: Array,
+    selectedTaskId: String,
+    editedTaskId: String
   },
 
   components: {
     Task
   },
-  methods: {
-  },
-  created() {
-    debugger;
-    const _this = this;
-      tasksService.fetchTasks().then(tasks => {
-        debugger;
-        _this.tasks = tasks;
 
-      }).catch(err => console.log(err));
+  created() {
+    console.log(this.tasks);
+    console.log(this.selectedTaskId);
+    console.log(this.editedTaskId);
   }
 }
 

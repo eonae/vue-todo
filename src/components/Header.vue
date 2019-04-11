@@ -3,7 +3,7 @@
 header.card-panel.indigo.darken-4
   a(href="#" class="brand-logo") EONAE TODO
   .controls
-    .user {{ user.username }}
+    .user(v-if="user.authorized") {{ user.username }}
 
 </template>
 
@@ -13,11 +13,14 @@ import bus from '../EventBus'
 
 export default {
   name: 'TodoHeader',
-  props: {
-    user: {
-      type: Object,
-      required: true
+
+  computed: {
+    user () {
+      return this.$store.state.user;
     }
+    // authorized() {
+    //   return this.user.authorized;
+    // }
   }
 }
 

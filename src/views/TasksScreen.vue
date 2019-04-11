@@ -5,12 +5,12 @@
     button#add.btn-floating.btn-large.waves-effect.waves-light.red(
       :disabled="editing",
       type="button",
-      @click.stop="newTask()")
+      @click.stop="newTaskHandler()")
       i.material-icons add
 
-    tasks-container(tasks="tasks",
-    :selectedTaskId="selectedTaskId",
-    :editedTaskId="editedTaskId")
+    tasks-container(:tasks="tasks.toArray()",
+      :selectedTaskId="selectedTaskId",
+      :editedTaskId="editedTaskId")
 
     details-bar(
       :task="selectedTask",
@@ -23,7 +23,10 @@
 import TasksContainer from '../components/TasksContainer.vue'
 import DetailsBar from '../components/DetailsBar.vue'
 
-import tasks from '../tasks.js';
+import tasksService from '../services/tasks'
+import Task from '../classes/Task';
+import TaskList from '../classes/TaskList'
+
 import bus from '../EventBus.js'
 
 export default {
@@ -35,53 +38,89 @@ export default {
     DetailsBar
   },
 
-  computed: {
-    selectedTask() {
-      const task = tasks.find(t => t.id === this.selectedTaskId);
-      return (task) ? task : null;
-    },
-    editing() {
-      return this.editedTaskId !== null
-    }
-  },
-
-  data: function () {
+  data() {
     return {
-      nextId: tasks.length, // Пока так.
-      tasks,
+      tasks: new TaskList(),
       selectedTaskId: null,
       editedTaskId: null,
       detailsShown: false
     }
   },
 
+  computed: {
+    selectedTask() {
+      const task = this.tasks.get(this.selectedTaskId);
+      return (task) ? task : null;
+    },
+    editing() {
+      return this.editedTaskId !== null;
+    }
+  },
+
   methods: {
 
-    removeTask(id) {
-      const index = this.tasks.findIndex(t => t.id === id);
-        if (index != -1)
-          this.tasks.splice(index, 1);
-      this.selectedTaskId = null;
+    saveChanges() {
+      // Возможно id стоит передавать в метод из-за асинхронности..
+      // Этот метод будет вызываться при завершении редактирования задачи
+      const task = this.tasks.get(this.editedTaskId);
+      const isNew = /new_/.test(task.id); // Является ли задача только что созданной.
+
+      return (isNew)
+        ? tasksService.addTask(task)
+        : tasksService.editTask(task);
+    },
+
+    fetchTasks() {
+      const vm = this;
+
+      tasksService
+        .fetchTasks()
+        .then(tasks => vm.tasks.addMany(tasks))
+        .catch(err => { debugger; });
+    },
+
+    newTaskHandler() {
+      //this.removeIfEmpty(this.editedTaskId);
+
+      const tempId = this.tasks.add().id;
+
+      this.selectedTaskId = tempId;
+      this.editedTaskId = tempId;
+    },
+
+    removeTaskHandler(id) {
+      // this.removeIfEmpty(this.editedTaskId);
+
+      const vm = this;
+
+      this.tasks.remove(id);
+      if (this.selectedTaskId == id) this.selectedTaskId = null;
+      if (this.editedTaskId == id) this.editedTaskId = null;
+
+      tasksService
+        .removeTask(id)
+        .catch(err => { debugger; });
+        
+    },
+
+    stopEditHandler() {
+      // this.removeIfEmpty(this.editedTaskId);
+
+      const vm = this;
+      const bufferId = this.editedTaskId;
+
+      this
+        .saveChanges()
+        .then(task => {
+          vm.tasks.get(bufferId).sync(task);
+        })
+        .catch(err => { debugger; })
+
       this.editedTaskId = null;
     },
 
-    removeIfEmpty(id) {
-
-      if (id !== null) {
-        const task = this.tasks.find(t => t.id === id);
-        if (task.text === '' && task.details === '')
-          this.removeTask(task.id);
-      }
-    },
-
-    reset() {
-      this.removeIfEmpty(this.editedTaskId);
-      this.selectedTaskId = null;
-      this.editedTaskId = null;
-    },
-
-    select(id) {
-      this.removeIfEmpty(this.editedTaskId);
+    selectHandler(id) {
+      // this.removeIfEmpty(this.editedTaskId);
 
       if (id === null) {
         this.detailsShown = false;
@@ -90,62 +129,60 @@ export default {
       this.selectedTaskId = id;
     },
 
-    edit(id) {
-      this.removeIfEmpty(this.editedTaskId);
+    startEditHandler(id) {
+      // this.removeIfEmpty(this.editedTaskId);
       this.editedTaskId = id;
       this.selectedTaskId = id;
     },
 
-    stopEdit() {
-      this.removeIfEmpty(this.editedTaskId);
-      this.editedTaskId = null;
-    },
+    // removeIfEmpty(id) {
 
-    newTask() {
-      this.removeIfEmpty(this.editedTaskId);
-      this.tasks.unshift({
-        id: this.nextId,
-        text: '',
-        done: false,
-        details: ''
-      });
-
-      this.selectedTaskId = this.nextId;
-      this.editedTaskId = this.nextId;
-      this.nextId++;
-    }
+    //   if (id !== null) {
+    //     const task = this.tasks.find(t => t.id === id);
+    //     if (task.text === '' && task.details === '')
+    //       this.removeTaskHandler(task.id);
+    //   }
+    // },
+    
+    // reset() {
+    //   // Используется ли где-то?
+    //   // this.removeIfEmpty(this.editedTaskId);
+    //   this.selectedTaskId = null;
+    //   this.editedTaskId = null;
+    // }
   },
   
   created() {
+
+    this.fetchTasks();
+
     bus.$on('edit', taskId => {
-      this.edit(taskId);
-      console.log('edit ' + taskId);
+      this.startEditHandler(taskId);
     });
+
     bus.$on('select', taskId => {
-      this.select(taskId);
+      this.selectHandler(taskId);
     });
+
     bus.$on('stopEdit', taskId => {
-      this.stopEdit(taskId);
+      this.stopEditHandler(taskId);
     });
-    bus.$on('newTask', () => {
-      this.newTask();
-    })
+
     bus.$on('deleteTask', taskId => {
-      this.removeTask(taskId);
+      this.removeTaskHandler(taskId);
     });
 
     bus.$on('toggleDetails', taskId => {
       this.detailsShown = !this.detailsShown;
       if (typeof taskId !== undefined) {
-        this.select(taskId);
+        this.selectHandler(taskId);
       }
     });
-    bus.$on('hideDetails', () => {
-      this.detailsShown = false;
-    });
+
     bus.$on('taskStatusChange', (taskId, value) => {
-      this.tasks.find(t => t.id === taskId).done = value;
-    })
+      this.tasks.get(taskId).isCompleted = value;
+      this.saveChanges();
+    });
   }
 }
 

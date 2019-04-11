@@ -6,7 +6,7 @@
     label
       input.custom-checkbox(
         type="checkbox",
-        :checked="task.done",
+        :checked="task.isCompleted",
         @change.stop="change($event)")
       span
     transition

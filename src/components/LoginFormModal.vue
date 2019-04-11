@@ -52,14 +52,14 @@ export default {
 
   methods: {
     submit() {
-      bus.$emit('loginAttempt', this.loginData);
-      console.log('submit');
+      this.$store.dispatch('login', this.loginData);
       // this.$emit('close');
     },
     cancel() {
       this.$emit('close');
     }
   },
+  
   created() {
     bus.$on('loginFail', err => {
       if (err.message === '401') {

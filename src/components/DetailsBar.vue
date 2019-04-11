@@ -13,7 +13,7 @@ aside(:class="[(isActive) ? 'active' : '', 'card']")
         name="details",
         maxlength="70",
         placeholder="Put your notes here..",
-        v-model.lazy="task.details")
+        v-model.lazy="task.notes")
 
 </template>
 
@@ -28,7 +28,6 @@ export default {
 
   methods: {
     hide () {
-      console.log('hide!');
       bus.$emit('toggleDetails', {});
     }
   }

@@ -1,64 +1,48 @@
-import bus from '../EventBus'
 import { serverUrl } from '../config';
+import { json, handleResponse } from '../util';
 
-console.log(serverUrl);
-console.log('authConnected');
+const url = serverUrl + '/auth';
 
-class AuthService {
-  constructor() {
-    this.user = { authorized: false };
-    bus.$on('loginAttempt', this.tryLogin.bind(this));
-  }
+export default class AuthService {
 
-  logout() {
+  static require() {
 
-    const _user = this.user;
-    fetch(serverUrl + '/logout', {
+    return fetch(url + '/require', {
       method: 'GET',
-      credentials: 'same-origin',
+      credentials: 'include',
       mode: 'cors'
-    }).then(response => {
-      if (response.ok) {
-        _user = { authorized: false };
-      }
-    }).catch(err => {
-      console.log(err);
-    });
+    })
+    .then(response => {
+      return json(response);
+    })
   }
 
-  tryLogin(loginData) {
-    debugger;
-    const _user = this.user;
+  static logout() {
 
-    fetch(serverUrl + '/login', {
+    return fetch(url + '/logout', {
+      method: 'GET',
+      credentials: 'include',
+      mode: 'cors'
+    })
+    .then(response => {
+      return handleResponse(response);
+    })
+  }
+
+  static login(loginData) {
+
+    return fetch(url + '/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      credentials: 'same-origin',
+      credentials: 'include',
       mode: 'cors',
       body: JSON.stringify(loginData)
-
-    }).then(response => {
-
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error(response.status);
-      }
-    }).then(result => {
-      debugger;
-        _user.username = result.username;
-        _user.authorized = true;
-        bus.$emit('changeUser', result);
-      
-    }).catch(err => {
-
-      bus.$emit('loginFail', err);
-    });
+    })
+    .then(response => {
+      return json(response);
+    })
   }
 }
-
-export default new AuthService();
-
