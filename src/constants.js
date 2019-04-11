@@ -1,3 +1,3 @@
 export const STATUS_CODES = {
-    FORBIDDEN: 403
-  }
+  FORBIDDEN: 403
+}

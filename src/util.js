@@ -1,5 +1,6 @@
 export function json(response) {
 // Возвращает json или переводит Promise в состояние rejected
+
   return (response.ok)
     ? response.json()
     : Promise.reject(response.status);

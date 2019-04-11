@@ -22,7 +22,9 @@
 <script>
 
 import bus from '../EventBus'
+import router from '../router'
 import Modal from '../components/ModalWindow.vue'
+import { STATUS_CODES } from '../constants';
 
 export default {
 
@@ -52,8 +54,17 @@ export default {
 
   methods: {
     submit() {
-      this.$store.dispatch('login', this.loginData);
-      // this.$emit('close');
+      this.$store
+        .dispatch('login', this.loginData)
+        .then(() => {
+          this.$emit('close');
+          router.push('/tasks');
+        })
+        .catch(err => {
+          if (err == STATUS_CODES.FORBIDDEN)
+            this.failed = true;
+          else debugger;
+        });
     },
     cancel() {
       this.$emit('close');
