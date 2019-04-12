@@ -2,9 +2,9 @@ import { serverUrl } from "../config";
 import { json, handleResponse } from '../util';
 const url = serverUrl + '/tasks';
 
-class TasksService {
+export default class TasksService {
 
-  fetchTasks() {
+  static fetchTasks() {
 
     return fetch(url, {
       method: 'GET',
@@ -16,7 +16,7 @@ class TasksService {
     });
   }
 
-  addTask(task) {
+  static addTask(task) {
 
     return fetch(url, {
       method: 'POST',
@@ -32,7 +32,7 @@ class TasksService {
     });
   }
 
-  editTask(task) {
+  static editTask(task) {
 
     return fetch(`${url}/${task.id}`, {
       method: 'PUT',
@@ -49,7 +49,7 @@ class TasksService {
 
   }
 
-  removeTask(id) {
+  static removeTask(id) {
 
     return fetch(`${url}/${id}`, {
       method: 'DELETE',
@@ -61,5 +61,3 @@ class TasksService {
     })
   }
 }
-
-export default new TasksService();

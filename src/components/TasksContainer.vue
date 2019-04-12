@@ -3,11 +3,10 @@
 div(v-bar)
   main
     transition-group(tag="div" name="tasks")
-      task(v-for="item in tasks",
-          :key = "item.key",
-          :task = "item",
-          :isSelected = "selectedTaskId === item.id",
-          :isBeingEdited = "editedTaskId === item.id")
+      task(v-for="task in tasks",
+          :key = "task.key",
+          :task = "task",
+          :isSelected = "selectedTaskId === task.id")
 
 </template>
 
@@ -21,19 +20,17 @@ import {serverUrl} from '../config';
 export default {
 
   props: {
-    tasks: Array,
-    selectedTaskId: String,
-    editedTaskId: String
+    selectedTaskId: String
+  },
+
+  computed: {
+    tasks() {
+      return this.$store.state.tasks.list;
+    }
   },
 
   components: {
     Task
-  },
-
-  created() {
-    console.log(this.tasks);
-    console.log(this.selectedTaskId);
-    console.log(this.editedTaskId);
   }
 }
 

@@ -55,7 +55,7 @@ export default {
   methods: {
     submit() {
       this.$store
-        .dispatch('login', this.loginData)
+        .dispatch('user/login', this.loginData)
         .then(() => {
           this.$emit('close');
           router.push('/tasks');
@@ -69,14 +69,6 @@ export default {
     cancel() {
       this.$emit('close');
     }
-  },
-  
-  created() {
-    bus.$on('loginFail', err => {
-      if (err.message === '401') {
-        this.failed = true;
-      }
-    });
   }
 }
 </script>

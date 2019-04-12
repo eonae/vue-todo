@@ -1,16 +1,14 @@
 <template lang="pug">
 
-  .flex-cont
+  .flex-cont(v-on:keyup.ctrl.n="")
 
     button#add.btn-floating.btn-large.waves-effect.waves-light.red(
-      :disabled="editing",
       type="button",
-      @click.stop="newTaskHandler()")
+      @keyup.ctrl.space="test()",
+      @click.stop="createTaskHandler()")
       i.material-icons add
 
-    tasks-container(:tasks="tasks.toArray()",
-      :selectedTaskId="selectedTaskId",
-      :editedTaskId="editedTaskId")
+    tasks-container(:selectedTaskId="selectedTaskId")
 
     details-bar(
       :task="selectedTask",
@@ -24,9 +22,7 @@ import TasksContainer from '../components/TasksContainer.vue'
 import DetailsBar from '../components/DetailsBar.vue'
 
 import tasksService from '../services/tasks'
-import Task from '../classes/Task';
-import TaskList from '../classes/TaskList'
-
+import Task from '../models/Task';
 import bus from '../EventBus.js'
 
 export default {
@@ -40,88 +36,31 @@ export default {
 
   data() {
     return {
-      tasks: new TaskList(),
       selectedTaskId: null,
-      editedTaskId: null,
       detailsShown: false
     }
   },
 
   computed: {
     selectedTask() {
-      const task = this.tasks.get(this.selectedTaskId);
-      return (task) ? task : null;
+      this.$store.getters['tasks/getById'](this.selectedTaskId);
     },
-    editing() {
-      return this.editedTaskId !== null;
-    }
   },
 
   methods: {
 
-    saveChanges() {
-      // Возможно id стоит передавать в метод из-за асинхронности..
-      // Этот метод будет вызываться при завершении редактирования задачи
-      const task = this.tasks.get(this.editedTaskId);
-      const isNew = /new_/.test(task.id); // Является ли задача только что созданной.
-
-      return (isNew)
-        ? tasksService.addTask(task)
-        : tasksService.editTask(task);
-    },
-
-    fetchTasks() {
-      const vm = this;
-
-      tasksService
-        .fetchTasks()
-        .then(tasks => vm.tasks.addMany(tasks))
-        .catch(err => { debugger; });
-    },
-
-    newTaskHandler() {
-      //this.removeIfEmpty(this.editedTaskId);
-
-      const tempId = this.tasks.add().id;
-
-      this.selectedTaskId = tempId;
-      this.editedTaskId = tempId;
-    },
-
-    removeTaskHandler(id) {
-      // this.removeIfEmpty(this.editedTaskId);
+    createTaskHandler() {
 
       const vm = this;
-
-      this.tasks.remove(id);
-      if (this.selectedTaskId == id) this.selectedTaskId = null;
-      if (this.editedTaskId == id) this.editedTaskId = null;
-
-      tasksService
-        .removeTask(id)
-        .catch(err => { debugger; });
-        
-    },
-
-    stopEditHandler() {
-      // this.removeIfEmpty(this.editedTaskId);
-
-      const vm = this;
-      const bufferId = this.editedTaskId;
-
-      this
-        .saveChanges()
+      this.$store
+        .dispatch('tasks/add')
         .then(task => {
-          vm.tasks.get(bufferId).sync(task);
-        })
-        .catch(err => { debugger; })
-
-      this.editedTaskId = null;
+          vm.selectedTaskId = task.id;
+        });
     },
 
     selectHandler(id) {
-      // this.removeIfEmpty(this.editedTaskId);
-
+      // debugger;
       if (id === null) {
         this.detailsShown = false;
       }
@@ -129,60 +68,18 @@ export default {
       this.selectedTaskId = id;
     },
 
-    startEditHandler(id) {
-      // this.removeIfEmpty(this.editedTaskId);
-      this.editedTaskId = id;
-      this.selectedTaskId = id;
-    },
-
-    // removeIfEmpty(id) {
-
-    //   if (id !== null) {
-    //     const task = this.tasks.find(t => t.id === id);
-    //     if (task.text === '' && task.details === '')
-    //       this.removeTaskHandler(task.id);
-    //   }
-    // },
-    
-    // reset() {
-    //   // Используется ли где-то?
-    //   // this.removeIfEmpty(this.editedTaskId);
-    //   this.selectedTaskId = null;
-    //   this.editedTaskId = null;
-    // }
-  },
-  
-  created() {
-
-    this.fetchTasks();
-
-    bus.$on('edit', taskId => {
-      this.startEditHandler(taskId);
-    });
-
-    bus.$on('select', taskId => {
-      this.selectHandler(taskId);
-    });
-
-    bus.$on('stopEdit', taskId => {
-      this.stopEditHandler(taskId);
-    });
-
-    bus.$on('deleteTask', taskId => {
-      this.removeTaskHandler(taskId);
-    });
-
-    bus.$on('toggleDetails', taskId => {
+    toggleDetailsHandler(id) {
       this.detailsShown = !this.detailsShown;
       if (typeof taskId !== undefined) {
         this.selectHandler(taskId);
       }
-    });
-
-    bus.$on('taskStatusChange', (taskId, value) => {
-      this.tasks.get(taskId).isCompleted = value;
-      this.saveChanges();
-    });
+    }    
+  },
+  
+  created() {
+    this.$store.dispatch('tasks/fetch');
+    bus.$on('select', this.selectHandler);
+    bus.$on('toggleDetails', this.toggleDetails);
   }
 }
 

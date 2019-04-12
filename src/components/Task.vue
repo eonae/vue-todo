@@ -1,24 +1,27 @@
 <template lang="pug">
 
 .todo-item.card(
-  @click="select()",
+  @click="select($event)",
   :class="[ this.isSelected ? 'indigo lighten-5 active' : '', 'todo-item card']")
+    
     label
       input.custom-checkbox(
         type="checkbox",
         :checked="task.isCompleted",
-        @change.stop="change($event)")
+        @change.stop="modifyStatus($event)")
       span
+
     transition
       .input-field(v-if="isBeingEdited")
         input(
           type="text",
-          v-model.lazy="task.text",
+          :value="task.text",
           v-focus,
-          @click.stop="",
-          @blur="stopEdit()",
-          @keyup.enter="$event.target.blur()")
+          @blur="stopEdit($event)",
+          @keyup.enter="$event.target.blur()",
+          @keyup.esc="cancelChanges()")
       .task(v-else, @click.stop="edit()") {{ task.text }}
+
     .btns-group
       button.btn-notes.icon-btn(@click.stop="toggleDetails()")
         i.material-icons subject
@@ -43,10 +46,12 @@ export default {
     isSelected: {
       type: Boolean,
       default: false
-    },
-    isBeingEdited: {
-      type: Boolean,
-      default: false
+    }
+  },
+  data() {
+    return {
+      isBeingEdited: false,
+      changesCanceled: false
     }
   },
 
@@ -54,30 +59,64 @@ export default {
     focus: {
       inserted(input) {
         input.focus();
-      } 
+      }
     }
   },
 
   methods: {
-    select() {
-      bus.$emit('select', (!this.isSelected) ? this.task.id : null)
+
+    cancelChanges(event) {
+      this.changesCanceled = true;
+      this.isBeingEdited = false;
     },
-    stopEdit() {
-      console.log('stopEdit');
-      bus.$emit('stopEdit', this.task.id);
+
+    select(event) {
+      // В параметр event может прийти undefined, если target был удалён из DOM по v-if
+      if (event && event.target.tagName === 'DIV') {
+        bus.$emit('select', (!this.isSelected) ? this.task.id : null)
+      }
     },
     edit() {
-      bus.$emit('edit', this.task.id);
+      
+      this.isBeingEdited = true;
+      if (!this.isSelected) {
+        bus.$emit('select', this.task.id);
+      }
     },
+    stopEdit(event) {
+      if (this.changesCanceled) {
+        this.changesCanceled = false;
+      } else {
+        const text = event.target.value;
+        if (text === '' && this.task.isNew) {
+          this.$store.commit('tasks/remove', this.task.id);
+        } else {
+          this.isBeingEdited = false;
+          this.modify({ text: event.target.value });
+        }
+      }
+          
+    },
+
+    modifyStatus(event) {
+      this.modify({ isCompleted: event.target.checked });
+    },
+
+    modify(changes) {
+      this.$store.dispatch('tasks/modify', { id: this.task.id, changes });
+    },
+
+    deleteTask() {
+      this.$store.dispatch('tasks/remove', this.task.id);
+    },
+
     toggleDetails() {
       bus.$emit('toggleDetails', this.task.id);
     },
-    deleteTask() {
-      bus.$emit('deleteTask', this.task.id);
-    },
-    change($event) {
-      bus.$emit('taskStatusChange', this.task.id, $event.target.checked);
-    }
+  },
+
+  created() {
+    if (this.task.isNew) this.edit();
   }
 }
 
