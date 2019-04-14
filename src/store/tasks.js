@@ -60,8 +60,6 @@ export default {
           dispatch('add', task);
         }))
         .catch(err => { debugger; });
-
-        // Есть подозрения, что forEach здесь может работать неверно.
     },
 
     modify({commit, getters}, { id, changes }) {

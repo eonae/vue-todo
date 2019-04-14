@@ -1,5 +1,5 @@
 <template>
-  <div class="placeholder card">Register</div>
+  <div class="placeholder card">Profile</div>
 </template>
 
 <script>

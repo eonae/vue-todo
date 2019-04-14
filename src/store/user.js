@@ -7,10 +7,16 @@ export default {
 
   state: {
     username: undefined,
-    authorized: false
+    authorized: false,
+    initialized: false
   },
 
   mutations: {
+
+    initialize(state) {
+      if (!state.initialized) state.initialized = true;
+    },
+
     set(state, user) {
       state.username = user.username;
       state.authorized = true;
@@ -23,9 +29,14 @@ export default {
 
   actions: {
 
+    register({ commit }, credentials) {
+      return AuthService
+        .register(credentials)
+    },
+
     require({ commit }) {
       
-      AuthService
+      return AuthService
         .require()
         .then(user => {
           commit('set', user);
@@ -35,6 +46,9 @@ export default {
             commit('unset');
           } else debugger;
         })
+        .finally(() => {
+          commit('initialize');
+        });
     },
 
     login( { commit }, credentials) {

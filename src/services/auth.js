@@ -5,6 +5,20 @@ const url = serverUrl + '/auth';
 
 export default class AuthService {
 
+  static register(credentials) {
+    return fetch(url + '/register', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify(credentials)
+    })
+    .then(response => {
+      return handleResponse(response);
+    })
+  }
+
   static require() {
 
     return fetch(url + '/require', {

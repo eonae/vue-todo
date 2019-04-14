@@ -1,7 +1,7 @@
 <template lang="pug">
 
   modal-window(title="Sign In")
-    form(name="login", action="")
+    form(name="login")
       div.inputs-container
         .input-field.col.s12
           input.validate(v-model="loginData.username", id="username", type="text", @input="failed = false")
@@ -22,8 +22,7 @@
 <script>
 
 import bus from '../EventBus'
-import router from '../router'
-import Modal from '../components/ModalWindow.vue'
+import Modal from './ModalWindow.vue'
 import { STATUS_CODES } from '../constants';
 
 export default {
@@ -58,7 +57,7 @@ export default {
         .dispatch('user/login', this.loginData)
         .then(() => {
           this.$emit('close');
-          router.push('/tasks');
+          this.$router.push('/tasks');
         })
         .catch(err => {
           if (err == STATUS_CODES.FORBIDDEN)

@@ -1,9 +1,10 @@
 <template lang="pug">
 
-  .flex-cont(v-on:keyup.ctrl.n="")
+  .flex-cont
 
     button#add.btn-floating.btn-large.waves-effect.waves-light.red(
       type="button",
+      :disabled = "editingTask"
       @keyup.ctrl.space="test()",
       @click.stop="createTaskHandler()")
       i.material-icons add
@@ -11,7 +12,7 @@
     tasks-container(:selectedTaskId="selectedTaskId")
 
     details-bar(
-      :task="selectedTask",
+      :taskId="selectedTaskId",
       :isActive="detailsShown")
 
 </template>
@@ -37,6 +38,7 @@ export default {
   data() {
     return {
       selectedTaskId: null,
+      editingTask: false,
       detailsShown: false
     }
   },
@@ -60,15 +62,14 @@ export default {
     },
 
     selectHandler(id) {
-      // debugger;
       if (id === null) {
         this.detailsShown = false;
       }
-
       this.selectedTaskId = id;
     },
 
-    toggleDetailsHandler(id) {
+    toggleDetailsHandler(taskId) {
+
       this.detailsShown = !this.detailsShown;
       if (typeof taskId !== undefined) {
         this.selectHandler(taskId);
@@ -79,7 +80,10 @@ export default {
   created() {
     this.$store.dispatch('tasks/fetch');
     bus.$on('select', this.selectHandler);
-    bus.$on('toggleDetails', this.toggleDetails);
+    bus.$on('toggleDetails', this.toggleDetailsHandler);
+    bus.$on('edit', task => {
+      this.editingTask = (task) ? true : false;
+    });
   }
 }
 
@@ -108,11 +112,11 @@ export default {
   transform: translateY(-50%);
 }
 
-@media (max-width: 740px) {
+/* @media (max-width: 740px) {
   #add {
     left: 100% !important;
     transform: translateX(-100%) translateY(-50%) translateX(-10px) !important;
   }
-}
+} */
 
 </style>

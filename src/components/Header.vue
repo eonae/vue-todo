@@ -1,26 +1,21 @@
 <template lang="pug">
 
 header.card-panel.indigo.darken-4
-  a(href="#" class="brand-logo") EONAE TODO
-  .controls
-    .user(v-if="user.authorized") {{ user.username }}
+  a(href="#" class="brand-logo")
+    span EONAE 
+    | TODO
+  main-menu
 
 </template>
 
 <script>
 
-import bus from '../EventBus'
+import MainMenu from './MainMenu.vue'
 
 export default {
   name: 'TodoHeader',
-
-  computed: {
-    user () {
-      return this.$store.state.user;
-    }
-    // authorized() {
-    //   return this.user.authorized;
-    // }
+  components: {
+    MainMenu
   }
 }
 
@@ -38,22 +33,27 @@ header {
   padding: 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .brand-logo {
-  margin: 0 80px;
+  flex-grow: 1;
+  margin-left: 80px;
   color: white;
 }
 
-@media (max-width: 740px) {
+@media (max-width: 640px) {
   header {
-    justify-content: center;
+    justify-content: flex-end;
+  }
+  .brand-logo {
+    font-size: .7em;
   }
 }
 
-@media (max-width: 400px) {
-  .brand-logo {
-    font-size: 0.7em;
+@media (max-width: 500px) {
+  .brand-logo span{
+    display: none;
   }
 }
 

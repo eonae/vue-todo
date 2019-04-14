@@ -82,6 +82,7 @@ export default {
       if (!this.isSelected) {
         bus.$emit('select', this.task.id);
       }
+      bus.$emit('edit', this.task);
     },
     stopEdit(event) {
       if (this.changesCanceled) {
@@ -95,7 +96,7 @@ export default {
           this.modify({ text: event.target.value });
         }
       }
-          
+      bus.$emit('edit', null);
     },
 
     modifyStatus(event) {
@@ -111,6 +112,7 @@ export default {
     },
 
     toggleDetails() {
+      debugger;
       bus.$emit('toggleDetails', this.task.id);
     },
   },
@@ -131,10 +133,6 @@ export default {
   transition: 0.5s;
   opacity: 0;
 }
-/* 
-.todo-item.active > .btns-group {
-  opacity: 1;
-} */
 
 .todo-item:hover > .btns-group {
   opacity: 1;
@@ -159,10 +157,12 @@ export default {
 }
 
 .todo-item {
-  width: 100%;
+  box-sizing: border-box;
+  width: calc(100%-4px);
   padding: 2em;
   margin-left: 2px !important;
-  padding-right: 2%;
+  margin-right: 2px !important;
+  padding-right: 2% !important;
   display: flex;
   align-items: center;
   overflow: hidden !important;
@@ -207,14 +207,14 @@ export default {
   min-height: 1em;
 }
 
-  @media (max-width: 740px) {
-    .input-field {
-      font-size: 1.2em !important;
-    }
-    .task {
-      font-size: 1.2em;
-    }
+@media (max-width: 740px) {
+  .input-field {
+    font-size: .6em !important;
   }
+  .task {
+    font-size: 1.2em;
+  }
+}
 
 .input-field {
   margin: 0 !important;

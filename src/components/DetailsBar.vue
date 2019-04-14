@@ -11,6 +11,7 @@ aside(:class="[(isActive) ? 'active' : '', 'card']")
       textarea#notes.materialize-textarea(
         v-if="task",
         name="details",
+        @blur="saveChanges($event.target.value)"
         maxlength="70",
         placeholder="Put your notes here..",
         v-model.lazy="task.notes")
@@ -23,12 +24,28 @@ import bus from '../EventBus';
 
 export default {
   name: 'DetailsBar',
-
-  props: ['task', 'isActive'],
+  props: {
+    isActive: {
+      type: Boolean,
+      required: true
+    },
+    taskId: String
+  },
+  computed: {
+    task() {
+      return this.$store.getters['tasks/getById'](this.taskId);
+    }
+  },
 
   methods: {
     hide () {
       bus.$emit('toggleDetails', {});
+    },
+    saveChanges(note) {
+      console.log(note);
+      this.$store.dispatch('tasks/modify', {
+        id: this.taskId, changes: { notes: note }
+      })
     }
   }
 }
@@ -64,6 +81,21 @@ aside {
   opacity: 1 !important;
 }
 
+#hideDetails {
+  display: none;
+  position: fixed !important;
+  left: 100%;
+  transform: translateX(-100%) translateY(10%) translateX(-10px);
+  height: 30px;
+  width: 30px;
+}
+#hideDetails > i {
+  font-size: 1em !important;
+  line-height: 30px !important;
+  transform: translateY(-32%);
+  /* и снова хак*/
+}
+
   @media (max-width: 740px) {
     aside {
       position: absolute !important;
@@ -84,17 +116,7 @@ aside {
     }
 
     #hideDetails {
-      position: fixed !important;
-      left: 100%;
-      transform: translateX(-100%) translateY(10%) translateX(-10px);
-      height: 30px;
-      width: 30px;
-    }
-    #hideDetails > i {
-      font-size: 1em !important;
-      line-height: 30px !important;
-      transform: translateY(-32%);
-      /* и снова хак*/
+      display: block;
     }
     .textarea-wrapper {
       width: 90%;

@@ -1,13 +1,15 @@
 <template lang="pug">
 
 div(v-bar)
-  main
-    transition-group(tag="div" name="tasks")
-      task(v-for="task in tasks",
-          :key = "task.key",
-          :task = "task",
-          :isSelected = "selectedTaskId === task.id")
-
+    main
+      transition-group(, tag="div" name="tasks")
+        task(v-for="task in tasks",
+            :key = "task.key",
+            :task = "task",
+            :isSelected = "selectedTaskId === task.id")
+      transition(name="empty")
+        .no-tasks(v-if="isEmpty") Nothing no show
+      
 </template>
 
 <script>
@@ -26,6 +28,9 @@ export default {
   computed: {
     tasks() {
       return this.$store.state.tasks.list;
+    },
+    isEmpty() {
+      return this.tasks.length < 1;
     }
   },
 
@@ -37,6 +42,14 @@ export default {
 </script>
 
 <style>
+
+.empty-enter-active, .empty-leave-active {
+  transition: 0.2s !important;
+}
+
+.empty-enter, .empty-leave-to {
+  opacity: 0;
+}
 
 .tasks-enter-active, .tasks-leave-active {
   transition: 0.2s !important;
@@ -81,13 +94,13 @@ export default {
 
 .vb > .vb-dragger:hover > .vb-dragger-styler {
     background-color: rgba(48, 121, 244,.5);
-    margin: 0px;
+    margin: 0;
     height: 100%;
 }
 
 .vb.vb-dragging > .vb-dragger > .vb-dragger-styler {
     background-color: rgba(48, 121, 244,.5);
-    margin: 0px;
+    margin: 0;
     height: 100%;
 }
 
@@ -98,17 +111,41 @@ export default {
 .vb {
   flex-grow: 1;
 }
-  main {
-    box-sizing: border-box;
-    padding-right: 2em;
-    margin-top: 1px;
-    width: 100%;
-  }
 
-  @media (max-width: 740px) {
-    main {
-      margin-right: 0;
-    }
+main {
+  box-sizing: border-box !important;
+  width: 100%;
+  padding-right: 2em !important;
+  margin-top: 1px;
+  min-height: 100%;
+  position: relative;
+}
+
+@media (max-width: 740px) {
+  main {
+    margin-right: 0;
+    padding-right: 0 !important;
   }
+  
+  .vb > .vb-dragger {
+   width: 6px;
+   right: -20px;
+   /* Убрать с экрана  */
+   /* z-index: 1000; */
+ }
+}
+
+.no-tasks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
+  font-weight: 700;
+  opacity: .1;
+  min-width: 280px;
+  text-align: center;
+  padding-right: 20px;
+}
 
 </style>
